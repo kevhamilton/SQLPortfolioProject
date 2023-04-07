@@ -1,3 +1,6 @@
+--Below are SQL queries for the Covid Portfolio Project
+--At the end are the four queries used to Tableau Covid Dashboard
+
 Select *
 FROM `sql-covid-project-380700.covid_data.CovidDeaths`
 Where continent is not null
