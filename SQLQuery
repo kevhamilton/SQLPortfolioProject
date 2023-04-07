@@ -15,8 +15,8 @@ FROM sql-covid-project-380700.covid_data.CovidDeaths
 Where continent is not null
 ORDER BY 1,2;
 
-#looking at Total Cases vs Total Deaths
-#shows the likelihood of dying if you contract Covid in a specific country
+--looking at Total Cases vs Total Deaths
+--shows the likelihood of dying if you contract Covid in a specific country
 
 SELECT Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -24,8 +24,8 @@ WHERE location like '%States%'
 AND continent is not null
 ORDER BY 1,2;
 
-#Looking at the Total Cases by Population
-#Shows what percentage of population contracted Covid
+--Looking at the Total Cases by Population
+--Shows what percentage of population contracted Covid
 
 SELECT Location, date, total_cases, Population, (total_cases/population)*100 as PercentPopulationInfected
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -33,7 +33,7 @@ WHERE location like '%States%'
 AND continent is not null
 ORDER BY 1,2;
 
-#Looking at Countries with Highest Infection Rate compared to Population
+--Looking at Countries with Highest Infection Rate compared to Population
 
 SELECT Location, Population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercentPopulationInfected
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -42,7 +42,7 @@ WHERE continent is not null
 GROUP BY Location, Population
 ORDER BY PercentPopulationInfected desc;
 
-#Showing Countries with Highest Death Count per Population
+--Showing Countries with Highest Death Count per Population
 
 SELECT Location, MAX(total_deaths) as TotalDeathCount
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -50,7 +50,7 @@ WHERE continent is not null
 GROUP BY Location
 ORDER BY TotalDeathCount desc;
 
-#Breaking up the data by continent
+--Breaking up the data by continent
 
 SELECT location, MAX(total_deaths) as TotalDeathCount
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -58,7 +58,7 @@ WHERE continent is null
 GROUP BY location
 ORDER BY TotalDeathCount desc;
 
-#Showing the continents with the highest death counts
+--Showing the continents with the highest death counts
 
 SELECT location, MAX(total_deaths) as TotalDeathCount
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -66,7 +66,7 @@ WHERE continent is null
 GROUP BY location
 ORDER BY TotalDeathCount desc;
 
-#Global Numbers of total death rate
+--Global Numbers of total death rate
 
 SELECT SUM(new_cases) as total_cases, SUM(new_deaths) as total_deaths, SUM(new_deaths)/SUM(new_cases)*100 as GlobalDeathPercentage
 FROM sql-covid-project-380700.covid_data.CovidDeaths
@@ -90,8 +90,6 @@ JOIN sql-covid-project-380700.covid_data.CovidVaccinations vac
 ORDER BY 2, 3;
 
 --USE CTE
---Syntax seems different in BigQuery
---around 1:04:00
 
 --With PopvsVac (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
 --as
@@ -151,3 +149,44 @@ JOIN sql-covid-project-380700.covid_data.CovidVaccinations vac
   AND dea.date = vac.date
   WHERE dea.continent is not null;
 --ORDER BY 2, 3;
+
+
+--Tableau Table 1
+--Global Death Percentage
+
+SELECT SUM(new_cases) as total_cases, SUM(new_deaths) as total_deaths, SUM(new_deaths)/SUM(new_cases)*100 as GlobalDeathPercentage
+FROM sql-covid-project-380700.covid_data.CovidDeaths
+WHERE continent is not null
+ORDER BY 1,2;
+
+
+--Tableau Table 2
+--Total Deaths by Continent
+
+SELECT location, MAX(total_deaths) as TotalDeathCount
+FROM sql-covid-project-380700.covid_data.CovidDeaths
+WHERE continent is null
+  AND location NOT IN ('World', 'European Union', 'High income', 'Upper middle income', 'Lower middle income', 'Low income')
+GROUP BY location
+ORDER BY TotalDeathCount desc;
+
+
+--Tableau Table 3
+--Percent of each countries population that has been infected
+
+SELECT Location, Population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercentPopulationInfected
+FROM sql-covid-project-380700.covid_data.CovidDeaths
+WHERE continent is not null
+GROUP BY Location, Population
+ORDER BY PercentPopulationInfected desc;
+
+--Tableau Table 4
+--Percent Infected By Date Per Continent
+
+SELECT Location, Population, date, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercentPopulationInfected
+FROM sql-covid-project-380700.covid_data.CovidDeaths
+#Where location like '%States%'
+WHERE continent is null
+  AND location NOT IN ('World', 'European Union', 'High income', 'Upper middle income', 'Lower middle income', 'Low income')
+GROUP BY Location, Population, date
+ORDER BY PercentPopulationInfected desc;
